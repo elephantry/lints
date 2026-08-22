@@ -10,18 +10,15 @@ fn main() -> elephantry::Result {
 }
 
 fn pass(elephantry: &elephantry::Connection) -> elephantry::Result {
-    elephantry.execute("select 1")
-        .map(convert::unit)
+    elephantry.execute("select 1").map(convert::unit)
 }
 
 fn fail(elephantry: &elephantry::Connection) -> elephantry::Result {
-    elephantry.execute("selec 1")
-        .map(convert::unit)
+    elephantry.execute("selec 1").map(convert::unit)
 }
 
 fn query(elephantry: &elephantry::Connection) -> elephantry::Result {
-    elephantry.query::<()>("select $*", &[&1])
-        .map(|_| ())
+    elephantry.query::<()>("select $*", &[&1]).map(|_| ())
 }
 
 mod convert {

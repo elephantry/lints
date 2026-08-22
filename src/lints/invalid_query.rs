@@ -9,7 +9,11 @@ dylint_linting::declare_late_lint! {
 }
 
 impl<'tcx> rustc_lint::LateLintPass<'tcx> for InvalidQuery {
-    fn check_expr(&mut self, cx: &rustc_lint::LateContext<'tcx>, expr: &'tcx rustc_hir::Expr<'tcx>) {
+    fn check_expr(
+        &mut self,
+        cx: &rustc_lint::LateContext<'tcx>,
+        expr: &'tcx rustc_hir::Expr<'tcx>,
+    ) {
         let config = elephantry::Config::from_env().unwrap();
         let elephantry = elephantry::Pool::from_config(&config).unwrap();
 
@@ -59,30 +63,36 @@ impl<'tcx> rustc_lint::LateLintPass<'tcx> for InvalidQuery {
 }
 
 impl InvalidQuery {
-    fn check_execute(elephantry: &elephantry::Connection, arg: &[rustc_hir::Expr]) -> elephantry::Result {
-         let rustc_hir::ExprKind::Lit(lit) = &arg[0].kind else {
-             return Ok(());
-         };
+    fn check_execute(
+        elephantry: &elephantry::Connection,
+        arg: &[rustc_hir::Expr],
+    ) -> elephantry::Result {
+        let rustc_hir::ExprKind::Lit(lit) = &arg[0].kind else {
+            return Ok(());
+        };
 
-         let rustc_ast::LitKind::Str(symbol, _) = lit.node else {
-             return Ok(());
-         };
+        let rustc_ast::LitKind::Str(symbol, _) = lit.node else {
+            return Ok(());
+        };
 
-         Self::check_sql(elephantry, &symbol.to_ident_string())
+        Self::check_sql(elephantry, &symbol.to_ident_string())
     }
 
-    fn check_query(elephantry: &elephantry::Connection, arg: &[rustc_hir::Expr]) -> elephantry::Result {
-         let rustc_hir::ExprKind::Lit(lit) = &arg[0].kind else {
-             return Ok(());
-         };
+    fn check_query(
+        elephantry: &elephantry::Connection,
+        arg: &[rustc_hir::Expr],
+    ) -> elephantry::Result {
+        let rustc_hir::ExprKind::Lit(lit) = &arg[0].kind else {
+            return Ok(());
+        };
 
-         let rustc_ast::LitKind::Str(symbol, _) = lit.node else {
-             return Ok(());
-         };
+        let rustc_ast::LitKind::Str(symbol, _) = lit.node else {
+            return Ok(());
+        };
 
-         let query = symbol.to_ident_string();
+        let query = symbol.to_ident_string();
 
-         Self::check_sql(elephantry, &Self::order_parameters(&query))
+        Self::check_sql(elephantry, &Self::order_parameters(&query))
     }
 
     fn order_parameters(query: &str) -> std::borrow::Cow<'_, str> {
@@ -100,14 +110,13 @@ impl InvalidQuery {
 
     fn check_sql(elephantry: &elephantry::Connection, query: &str) -> elephantry::Result {
         let mut query = query.to_string();
-         if !query.ends_with(';') {
-             query.push(';');
-         }
+        if !query.ends_with(';') {
+            query.push(';');
+        }
 
-         let sql = format!("DO $TEST$ BEGIN RETURN;{query}END; $TEST$;");
+        let sql = format!("DO $TEST$ BEGIN RETURN;{query}END; $TEST$;");
 
-         elephantry.execute(&sql)
-             .map(|_| ())
+        elephantry.execute(&sql).map(|_| ())
     }
 }
 

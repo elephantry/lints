@@ -1,7 +1,7 @@
 error: invalid SQL query
-  --> $DIR/invalid_query.rs:18:24
+  --> $DIR/invalid_query.rs:17:24
    |
-LL |     elephantry.execute("selec 1")
+LL |     elephantry.execute("selec 1").map(convert::unit)
    |                        ^^^^^^^^^
    |
    = help: ERROR:  syntax error at or near "selec" at character 24
