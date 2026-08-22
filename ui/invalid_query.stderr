@@ -1,0 +1,12 @@
+error: invalid SQL query
+  --> $DIR/invalid_query.rs:17:24
+   |
+LL |     elephantry.execute("selec 1")
+   |                        ^^^^^^^^^
+   |
+   = help: ERROR:  syntax error at or near "selec" at character 24
+           
+   = note: `#[deny(invalid_query)]` on by default
+
+error: aborting due to 1 previous error
+
