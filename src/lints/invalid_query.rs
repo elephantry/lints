@@ -39,6 +39,7 @@ impl<'tcx> rustc_lint::LateLintPass<'tcx> for InvalidQuery {
 
         let result = match name.ident.as_str() {
             "execute" => Self::check_execute(&elephantry, args),
+            "query" | "query_one" => Self::check_query(&elephantry, args),
             _ => return,
         };
 
@@ -67,7 +68,38 @@ impl InvalidQuery {
              return Ok(());
          };
 
-         let mut query = symbol.to_ident_string();
+         Self::check_sql(elephantry, &symbol.to_ident_string())
+    }
+
+    fn check_query(elephantry: &elephantry::Connection, arg: &[rustc_hir::Expr]) -> elephantry::Result {
+         let rustc_hir::ExprKind::Lit(lit) = &arg[0].kind else {
+             return Ok(());
+         };
+
+         let rustc_ast::LitKind::Str(symbol, _) = lit.node else {
+             return Ok(());
+         };
+
+         let query = symbol.to_ident_string();
+
+         Self::check_sql(elephantry, &Self::order_parameters(&query))
+    }
+
+    fn order_parameters(query: &str) -> std::borrow::Cow<'_, str> {
+        static REGEX: std::sync::LazyLock<regex::Regex> =
+            std::sync::LazyLock::new(|| regex::Regex::new(r"\$\*").unwrap());
+
+        let mut count = 0;
+
+        REGEX.replace_all(query, |captures: &regex::Captures<'_>| {
+            count += 1;
+
+            captures[0].replace("$*", &format!("${count}"))
+        })
+    }
+
+    fn check_sql(elephantry: &elephantry::Connection, query: &str) -> elephantry::Result {
+        let mut query = query.to_string();
          if !query.ends_with(';') {
              query.push(';');
          }

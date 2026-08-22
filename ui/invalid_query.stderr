@@ -1,5 +1,5 @@
 error: invalid SQL query
-  --> $DIR/invalid_query.rs:17:24
+  --> $DIR/invalid_query.rs:18:24
    |
 LL |     elephantry.execute("selec 1")
    |                        ^^^^^^^^^
