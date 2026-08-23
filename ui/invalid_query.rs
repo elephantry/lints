@@ -1,7 +1,6 @@
 #[allow(dead_code)]
-
 #[derive(elephantry::Entity)]
-#[elephantry(model = "Model", structure  = "Structure")]
+#[elephantry(model = "Model", structure = "Structure")]
 struct Entity {}
 
 fn main() {}
@@ -15,15 +14,27 @@ fn fail(elephantry: &elephantry::Connection) -> elephantry::Result {
 }
 
 fn query(elephantry: &elephantry::Connection) -> elephantry::Result {
-    elephantry.query::<()>("select $*", &[&1]).map(convert::unit)
+    elephantry
+        .query::<()>("select $*", &[&1])
+        .map(convert::unit)
 }
 
 fn find_all(elephantry: &elephantry::Connection) -> elephantry::Result {
-    elephantry.find_all::<Model>(Some("order y 1")).map(convert::unit)
+    elephantry
+        .find_all::<Model>(Some("order y 1"))
+        .map(convert::unit)
 }
 
 fn find_where(elephantry: &elephantry::Connection) -> elephantry::Result {
-    elephantry.find_where::<Model>("$* =", &[], None).map(convert::unit)
+    elephantry
+        .find_where::<Model>("$* =", &[], None)
+        .map(convert::unit)
+}
+
+fn paginate_find_where(elephantry: &elephantry::Connection) -> elephantry::Result {
+    elephantry
+        .paginate_find_where::<Model>("$* = 0", &[], 20, 0, None)
+        .map(convert::unit)
 }
 
 mod convert {

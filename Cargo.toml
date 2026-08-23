@@ -23,3 +23,7 @@ rustc_private = true
 [[example]]
 name = "invalid_query"
 path = "ui/invalid_query.rs"
+
+[[example]]
+name = "pager_start_page"
+path = "ui/pager_start_page.rs"

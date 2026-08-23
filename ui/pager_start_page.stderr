@@ -1,0 +1,10 @@
+warning: pager page starts at 1
+  --> $DIR/pager_start_page.rs:6:55
+   |
+LL |     let _ = elephantry::Pager::<()>::new(todo!(), 10, 0, 10);
+   |                                                       ^
+   |
+   = note: `#[warn(pager_start_page)]` on by default
+
+warning: 1 warning emitted
+
