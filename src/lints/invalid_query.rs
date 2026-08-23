@@ -75,10 +75,7 @@ impl InvalidQuery {
             return Ok(());
         }
 
-        if !matches!(
-            method.name.as_str(),
-            "find_where" | "paginate_find_where" | "count_where" | "exist_where"
-        ) {
+        if !method.name.ends_with("_where") {
             return Ok(());
         }
 

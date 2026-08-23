@@ -49,6 +49,12 @@ fn exist_where(elephantry: &elephantry::Connection) -> elephantry::Result {
         .map(convert::unit)
 }
 
+fn delete_where(elephantry: &elephantry::Connection) -> elephantry::Result {
+    elephantry
+        .delete_where::<Model>("", &[])
+        .map(convert::unit)
+}
+
 mod convert {
     pub fn unit<T>(_: T) -> () {
         ()
