@@ -75,7 +75,10 @@ impl InvalidQuery {
             return Ok(());
         }
 
-        if method.name != "find_where" && method.name != "paginate_find_where" {
+        if !matches!(
+            method.name.as_str(),
+            "find_where" | "paginate_find_where" | "count_where"
+        ) {
             return Ok(());
         }
 

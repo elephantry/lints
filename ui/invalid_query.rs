@@ -37,6 +37,12 @@ fn paginate_find_where(elephantry: &elephantry::Connection) -> elephantry::Resul
         .map(convert::unit)
 }
 
+fn count_where(elephantry: &elephantry::Connection) -> elephantry::Result {
+    elephantry
+        .count_where::<Model>("valid = $", &[&true])
+        .map(convert::unit)
+}
+
 mod convert {
     pub fn unit<T>(_: T) -> () {
         ()

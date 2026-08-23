@@ -34,5 +34,14 @@ LL |         .paginate_find_where::<Model>("$* = 0", &[], 20, 0, None)
    |
    = note: `#[warn(pager_start_page)]` on by default
 
-error: aborting due to 3 previous errors; 1 warning emitted
+error: invalid SQL query
+  --> $DIR/invalid_query.rs:42:31
+   |
+LL |         .count_where::<Model>("valid = $", &[&true])
+   |                               ^^^^^^^^^^^
+   |
+   = help: ERROR:  syntax error at or near "$" at character 47
+           
+
+error: aborting due to 4 previous errors; 1 warning emitted
 
