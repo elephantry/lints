@@ -1,5 +1,9 @@
 #[allow(dead_code)]
 
+#[derive(elephantry::Entity)]
+#[elephantry(model = "Model", structure  = "Structure")]
+struct Entity {}
+
 fn main() {}
 
 fn pass(elephantry: &elephantry::Connection) -> elephantry::Result {
@@ -15,11 +19,11 @@ fn query(elephantry: &elephantry::Connection) -> elephantry::Result {
 }
 
 fn find_all(elephantry: &elephantry::Connection) -> elephantry::Result {
-    #[derive(elephantry::Entity)]
-    #[elephantry(model = "Model", structure  = "Structure")]
-    struct Entity {}
-
     elephantry.find_all::<Model>(Some("order y 1")).map(convert::unit)
+}
+
+fn find_where(elephantry: &elephantry::Connection) -> elephantry::Result {
+    elephantry.find_where::<Model>("$* =", &[], None).map(convert::unit)
 }
 
 mod convert {

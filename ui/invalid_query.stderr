@@ -1,5 +1,5 @@
 error: invalid SQL query
-  --> $DIR/invalid_query.rs:10:24
+  --> $DIR/invalid_query.rs:14:24
    |
 LL |     elephantry.execute("selec 1").map(convert::unit)
    |                        ^^^^^^^^^
@@ -17,5 +17,14 @@ LL |     elephantry.find_all::<Model>(Some("order y 1")).map(convert::unit)
    = help: ERROR:  syntax error at or near "y" at character 39
            
 
-error: aborting due to 2 previous errors
+error: invalid SQL query
+  --> $DIR/invalid_query.rs:26:36
+   |
+LL |     elephantry.find_where::<Model>("$* =", &[], None).map(convert::unit)
+   |                                    ^^^^^^
+   |
+   = help: ERROR:  syntax error at end of input at character 43
+           
+
+error: aborting due to 3 previous errors
 

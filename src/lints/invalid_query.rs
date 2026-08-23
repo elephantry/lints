@@ -45,6 +45,10 @@ impl<'tcx> rustc_lint::LateLintPass<'tcx> for InvalidQuery {
             "execute" => Self::check_execute(&elephantry, args[0]),
             "query" | "query_one" => Self::check_query(&elephantry, args[0]),
             "find_all" => Self::check_suffix(cx, &elephantry, args[0]),
+            "find_where" => {
+                Self::check_clause(cx, &elephantry, args[0])
+                    .and_then(|_| Self::check_suffix(cx, &elephantry, args[2]))
+            }
 
             _ => return,
         };
@@ -108,6 +112,20 @@ impl InvalidQuery {
 
             captures[0].replace("$*", &format!("${count}"))
         })
+    }
+
+    fn check_clause(cx: &rustc_lint::LateContext<'_>, elephantry: &elephantry::Connection, arg: rustc_hir::Expr) -> elephantry::Result {
+        let rustc_hir::ExprKind::Lit(lit) = &arg.kind else {
+            return Ok(());
+        };
+
+        let rustc_ast::LitKind::Str(symbol, _) = lit.node else {
+            return Ok(());
+        };
+
+        let clause = symbol.to_ident_string();
+
+        Self::check_sql(elephantry, &format!("select 1 where {}", Self::order_parameters(&clause)))
     }
 
     fn check_suffix(cx: &rustc_lint::LateContext<'_>, elephantry: &elephantry::Connection, suffix: rustc_hir::Expr) -> elephantry::Result {
