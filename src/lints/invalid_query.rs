@@ -77,7 +77,7 @@ impl InvalidQuery {
 
         if !matches!(
             method.name.as_str(),
-            "find_where" | "paginate_find_where" | "count_where"
+            "find_where" | "paginate_find_where" | "count_where" | "exist_where"
         ) {
             return Ok(());
         }

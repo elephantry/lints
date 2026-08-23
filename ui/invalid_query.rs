@@ -43,6 +43,12 @@ fn count_where(elephantry: &elephantry::Connection) -> elephantry::Result {
         .map(convert::unit)
 }
 
+fn exist_where(elephantry: &elephantry::Connection) -> elephantry::Result {
+    elephantry
+        .exist_where::<Model>("valid = $", &[&true])
+        .map(convert::unit)
+}
+
 mod convert {
     pub fn unit<T>(_: T) -> () {
         ()

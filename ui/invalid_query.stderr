@@ -43,5 +43,14 @@ LL |         .count_where::<Model>("valid = $", &[&true])
    = help: ERROR:  syntax error at or near "$" at character 47
            
 
-error: aborting due to 4 previous errors; 1 warning emitted
+error: invalid SQL query
+  --> $DIR/invalid_query.rs:48:31
+   |
+LL |         .exist_where::<Model>("valid = $", &[&true])
+   |                               ^^^^^^^^^^^
+   |
+   = help: ERROR:  syntax error at or near "$" at character 47
+           
+
+error: aborting due to 5 previous errors; 1 warning emitted
 
