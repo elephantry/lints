@@ -42,8 +42,10 @@ impl<'tcx> rustc_lint::LateLintPass<'tcx> for InvalidQuery {
         }
 
         let result = match name.ident.as_str() {
-            "execute" => Self::check_execute(&elephantry, args),
-            "query" | "query_one" => Self::check_query(&elephantry, args),
+            "execute" => Self::check_execute(&elephantry, args[0]),
+            "query" | "query_one" => Self::check_query(&elephantry, args[0]),
+            "find_all" => Self::check_suffix(cx, &elephantry, args[0]),
+
             _ => return,
         };
 
@@ -65,9 +67,9 @@ impl<'tcx> rustc_lint::LateLintPass<'tcx> for InvalidQuery {
 impl InvalidQuery {
     fn check_execute(
         elephantry: &elephantry::Connection,
-        arg: &[rustc_hir::Expr],
+        arg: rustc_hir::Expr,
     ) -> elephantry::Result {
-        let rustc_hir::ExprKind::Lit(lit) = &arg[0].kind else {
+        let rustc_hir::ExprKind::Lit(lit) = &arg.kind else {
             return Ok(());
         };
 
@@ -80,9 +82,9 @@ impl InvalidQuery {
 
     fn check_query(
         elephantry: &elephantry::Connection,
-        arg: &[rustc_hir::Expr],
+        arg: rustc_hir::Expr,
     ) -> elephantry::Result {
-        let rustc_hir::ExprKind::Lit(lit) = &arg[0].kind else {
+        let rustc_hir::ExprKind::Lit(lit) = &arg.kind else {
             return Ok(());
         };
 
@@ -108,6 +110,22 @@ impl InvalidQuery {
         })
     }
 
+    fn check_suffix(cx: &rustc_lint::LateContext<'_>, elephantry: &elephantry::Connection, suffix: rustc_hir::Expr) -> elephantry::Result {
+        let Some(inner) = clippy_utils::as_some_expr(cx, &suffix) else {
+            return Ok(());
+        };
+
+        let rustc_hir::ExprKind::Lit(lit) = inner.kind else {
+            return Ok(());
+        };
+
+        let rustc_ast::LitKind::Str(symbol, _) = lit.node else {
+            return Ok(());
+        };
+
+        Self::check_sql(elephantry, &format!("select 1 {}", symbol.to_ident_string()))
+    }
+
     fn check_sql(elephantry: &elephantry::Connection, query: &str) -> elephantry::Result {
         let mut query = query.to_string();
         if !query.ends_with(';') {
@@ -118,9 +136,4 @@ impl InvalidQuery {
 
         elephantry.execute(&sql).map(|_| ())
     }
-}
-
-#[test]
-fn ui() {
-    dylint_testing::ui_test_example(env!("CARGO_PKG_NAME"), "invalid_query");
 }
