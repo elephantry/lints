@@ -67,7 +67,5 @@ fn upsert(elephantry: &elephantry::Connection) -> elephantry::Result {
 }
 
 mod convert {
-    pub fn unit<T>(_: T) -> () {
-        ()
-    }
+    pub fn unit<T>(_: T) {}
 }

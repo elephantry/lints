@@ -25,7 +25,7 @@ impl<'tcx> rustc_lint::LateLintPass<'tcx> for InvalidQuery {
 
         results
             .into_iter()
-            .filter_map(|x| x.err())
+            .filter_map(std::result::Result::err)
             .for_each(|(err, expr)| {
                 clippy_utils::diagnostics::span_lint_and_help(
                     cx,
@@ -108,7 +108,7 @@ impl InvalidQuery {
             _ => return Ok(()),
         };
 
-        let Some(suffix) = clippy_utils::as_some_expr(cx, &arg) else {
+        let Some(suffix) = clippy_utils::as_some_expr(cx, arg) else {
             return Ok(());
         };
 
@@ -169,13 +169,13 @@ impl InvalidQuery {
         Self::check_sql(elephantry, &query, order).map_err(|e| (e, arg))
     }
 
-    fn check_sql<'a>(
+    fn check_sql(
         elephantry: &elephantry::Connection,
         sql: &str,
         order: bool,
     ) -> elephantry::Result {
         let mut query = if order {
-            Self::order_parameters(&sql).to_string()
+            Self::order_parameters(sql).to_string()
         } else {
             sql.to_string()
         };

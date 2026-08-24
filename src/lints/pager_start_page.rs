@@ -7,26 +7,26 @@ impl<'tcx> rustc_lint::LateLintPass<'tcx> for PagerStartPage {
         cx: &rustc_lint::LateContext<'tcx>,
         expr: &'tcx rustc_hir::Expr<'tcx>,
     ) {
-        if let Some(function) = super::function_call(cx, expr) {
-            if let Err(expr) = Self::check_pager_new(&function) {
-                clippy_utils::diagnostics::span_lint(
-                    cx,
-                    PAGER_START_PAGE,
-                    expr.span,
-                    "pager page starts at 1",
-                );
-            }
+        if let Some(function) = super::function_call(cx, expr)
+            && let Err(expr) = Self::check_pager_new(&function)
+        {
+            clippy_utils::diagnostics::span_lint(
+                cx,
+                PAGER_START_PAGE,
+                expr.span,
+                "pager page starts at 1",
+            );
         }
 
-        if let Some(method) = super::method_call(cx, expr) {
-            if let Err(expr) = Self::check_paginate_find_where(&method) {
-                clippy_utils::diagnostics::span_lint(
-                    cx,
-                    PAGER_START_PAGE,
-                    expr.span,
-                    "pager page starts at 1",
-                );
-            }
+        if let Some(method) = super::method_call(cx, expr)
+            && let Err(expr) = Self::check_paginate_find_where(&method)
+        {
+            clippy_utils::diagnostics::span_lint(
+                cx,
+                PAGER_START_PAGE,
+                expr.span,
+                "pager page starts at 1",
+            );
         }
     }
 }

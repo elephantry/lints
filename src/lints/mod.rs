@@ -14,9 +14,7 @@ pub fn register_lints(sess: &rustc_session::Session, lint_store: &mut rustc_lint
 
 #[derive(Debug)]
 struct Method<'a> {
-    krate: String,
     path: String,
-    caller: String,
     name: String,
     args: &'a [rustc_hir::Expr<'a>],
 }
@@ -44,9 +42,7 @@ fn method_call<'a>(
     let did = adt.did();
 
     let method = Method {
-        krate: cx.tcx.crate_name(did.krate).to_string(),
-        path: cx.tcx.def_path_str(did).to_string(),
-        caller: cx.tcx.item_name(did).to_string(),
+        path: cx.tcx.def_path_str(did),
         name: name.ident.to_string(),
         args,
     };
@@ -56,9 +52,7 @@ fn method_call<'a>(
 
 #[derive(Debug)]
 struct Function<'a> {
-    krate: String,
     path: String,
-    name: String,
     args: &'a [rustc_hir::Expr<'a>],
 }
 
@@ -77,9 +71,7 @@ fn function_call<'a>(
     };
 
     let function = Function {
-        krate: cx.tcx.crate_name(ty.krate).to_string(),
-        path: cx.tcx.def_path_str(*ty).to_string(),
-        name: cx.tcx.item_name(*ty).to_string(),
+        path: cx.tcx.def_path_str(*ty),
         args,
     };
 

@@ -1,8 +1,8 @@
 warning: pager page starts at 1
-  --> $DIR/pager_start_page.rs:6:55
+  --> $DIR/pager_start_page.rs:7:63
    |
-LL |     let _ = elephantry::Pager::<()>::new(todo!(), 10, 0, 10);
-   |                                                       ^
+LL |     let pager = elephantry::Pager::<()>::new(rows.into(), 10, 0, 10);
+   |                                                               ^
    |
    = note: `#[warn(pager_start_page)]` on by default
 
