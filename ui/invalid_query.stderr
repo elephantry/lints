@@ -1,5 +1,5 @@
 error: invalid SQL query
-  --> $DIR/invalid_query.rs:13:24
+  --> $DIR/invalid_query.rs:14:24
    |
 LL |     elephantry.execute("selec 1").map(convert::unit)
    |                        ^^^^^^^^^
@@ -9,7 +9,7 @@ LL |     elephantry.execute("selec 1").map(convert::unit)
    = note: `#[deny(invalid_query)]` on by default
 
 error: invalid SQL query
-  --> $DIR/invalid_query.rs:24:33
+  --> $DIR/invalid_query.rs:25:33
    |
 LL |         .find_all::<Model>(Some("order y 1"))
    |                                 ^^^^^^^^^^^
@@ -18,7 +18,7 @@ LL |         .find_all::<Model>(Some("order y 1"))
            
 
 error: invalid SQL query
-  --> $DIR/invalid_query.rs:30:30
+  --> $DIR/invalid_query.rs:31:30
    |
 LL |         .find_where::<Model>("$* =", &[], None)
    |                              ^^^^^^
@@ -27,7 +27,7 @@ LL |         .find_where::<Model>("$* =", &[], None)
            
 
 warning: pager page starts at 1
-  --> $DIR/invalid_query.rs:36:58
+  --> $DIR/invalid_query.rs:37:58
    |
 LL |         .paginate_find_where::<Model>("$* = 0", &[], 20, 0, None)
    |                                                          ^
@@ -35,7 +35,7 @@ LL |         .paginate_find_where::<Model>("$* = 0", &[], 20, 0, None)
    = note: `#[warn(pager_start_page)]` on by default
 
 error: invalid SQL query
-  --> $DIR/invalid_query.rs:42:31
+  --> $DIR/invalid_query.rs:43:31
    |
 LL |         .count_where::<Model>("valid = $", &[&true])
    |                               ^^^^^^^^^^^
@@ -44,7 +44,7 @@ LL |         .count_where::<Model>("valid = $", &[&true])
            
 
 error: invalid SQL query
-  --> $DIR/invalid_query.rs:48:31
+  --> $DIR/invalid_query.rs:49:31
    |
 LL |         .exist_where::<Model>("valid = $", &[&true])
    |                               ^^^^^^^^^^^
@@ -53,13 +53,22 @@ LL |         .exist_where::<Model>("valid = $", &[&true])
            
 
 error: invalid SQL query
-  --> $DIR/invalid_query.rs:54:32
+  --> $DIR/invalid_query.rs:54:38
    |
-LL |         .delete_where::<Model>("", &[])
-   |                                ^^
+LL |     elephantry.delete_where::<Model>("", &[]).map(convert::unit)
+   |                                      ^^
    |
    = help: ERROR:  syntax error at end of input at character 38
            
 
-error: aborting due to 6 previous errors; 1 warning emitted
+error: invalid SQL query
+  --> $DIR/invalid_query.rs:58:34
+   |
+LL |     elephantry.r#async().execute("s").await.map(convert::unit)
+   |                                  ^^^
+   |
+   = help: ERROR:  syntax error at or near "s" at character 25
+           
+
+error: aborting due to 7 previous errors; 1 warning emitted
 

@@ -31,11 +31,12 @@ fn method_call<'a>(
 
     let caller_ty = cx.typeck_results().expr_ty(recv);
 
-    let rustc_middle::ty::Ref(_, ty, _) = caller_ty.kind() else {
-        return None;
-    };
-
-    let rustc_middle::ty::Adt(adt, _) = ty.kind() else {
+    let adt = if let rustc_middle::ty::Ref(_, ty, _) = caller_ty.kind()
+        && let rustc_middle::ty::Adt(adt, _) = ty.kind() {
+        adt
+    } else if let rustc_middle::ty::Adt(adt, _) = caller_ty.kind() {
+        adt
+    } else {
         return None;
     };
 

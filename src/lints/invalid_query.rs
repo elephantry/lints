@@ -41,7 +41,7 @@ impl InvalidQuery {
         elephantry: &elephantry::Connection,
         method: &super::Method<'a>,
     ) -> Result<'a> {
-        if method.path != "elephantry::Connection" {
+        if !matches!(method.path.as_str(), "elephantry::Connection" | "elephantry::Async") {
             return Ok(());
         }
 
@@ -56,7 +56,7 @@ impl InvalidQuery {
         elephantry: &elephantry::Connection,
         method: &super::Method<'a>,
     ) -> Result<'a> {
-        if method.path != "elephantry::Connection" {
+        if !matches!(method.path.as_str(), "elephantry::Connection" | "elephantry::Async") {
             return Ok(());
         }
 

@@ -1,4 +1,5 @@
-#[allow(dead_code)]
+#![allow(dead_code)]
+
 #[derive(elephantry::Entity)]
 #[elephantry(model = "Model", structure = "Structure")]
 struct Entity {}
@@ -50,9 +51,11 @@ fn exist_where(elephantry: &elephantry::Connection) -> elephantry::Result {
 }
 
 fn delete_where(elephantry: &elephantry::Connection) -> elephantry::Result {
-    elephantry
-        .delete_where::<Model>("", &[])
-        .map(convert::unit)
+    elephantry.delete_where::<Model>("", &[]).map(convert::unit)
+}
+
+async fn r#async(elephantry: &elephantry::Connection) -> elephantry::Result {
+    elephantry.r#async().execute("s").await.map(convert::unit)
 }
 
 mod convert {
