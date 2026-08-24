@@ -70,5 +70,23 @@ LL |     elephantry.r#async().execute("s").await.map(convert::unit)
    = help: ERROR:  syntax error at or near "s" at character 25
            
 
-error: aborting due to 7 previous errors; 1 warning emitted
+error: invalid SQL query
+  --> $DIR/invalid_query.rs:65:39
+   |
+LL |         .upsert_one::<Model>(&entity, "invalid_target", "invalid_action")
+   |                                       ^^^^^^^^^^^^^^^^
+   |
+   = help: ERROR:  syntax error at or near "invalid_target" at character 63
+           
+
+error: invalid SQL query
+  --> $DIR/invalid_query.rs:65:57
+   |
+LL |         .upsert_one::<Model>(&entity, "invalid_target", "invalid_action")
+   |                                                         ^^^^^^^^^^^^^^^^
+   |
+   = help: ERROR:  syntax error at or near "invalid_action" at character 73
+           
+
+error: aborting due to 9 previous errors; 1 warning emitted
 

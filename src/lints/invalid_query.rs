@@ -14,23 +14,28 @@ impl<'tcx> rustc_lint::LateLintPass<'tcx> for InvalidQuery {
         let config = elephantry::Config::from_env().unwrap();
         let elephantry = elephantry::Pool::from_config(&config).unwrap();
 
-        let result = Self::check_execute(&elephantry, &method)
-            .and_then(|_| Self::check_query(&elephantry, &method))
-            .and_then(|_| Self::check_suffix(cx, &elephantry, &method))
-            .and_then(|_| Self::check_clause(&elephantry, &method));
+        let results = [
+            Self::check_execute(&elephantry, &method),
+            Self::check_query(&elephantry, &method),
+            Self::check_suffix(cx, &elephantry, &method),
+            Self::check_clause(&elephantry, &method),
+            Self::check_upsert_target(&elephantry, &method),
+            Self::check_upsert_action(&elephantry, &method),
+        ];
 
-        let Err((err, expr)) = result else {
-            return;
-        };
-
-        clippy_utils::diagnostics::span_lint_and_help(
-            cx,
-            INVALID_QUERY,
-            expr.span,
-            "invalid SQL query",
-            None,
-            err.to_string(),
-        );
+        results
+            .into_iter()
+            .filter_map(|x| x.err())
+            .for_each(|(err, expr)| {
+                clippy_utils::diagnostics::span_lint_and_help(
+                    cx,
+                    INVALID_QUERY,
+                    expr.span,
+                    "invalid SQL query",
+                    None,
+                    err.to_string(),
+                );
+            });
     }
 }
 
@@ -41,7 +46,10 @@ impl InvalidQuery {
         elephantry: &elephantry::Connection,
         method: &super::Method<'a>,
     ) -> Result<'a> {
-        if !matches!(method.path.as_str(), "elephantry::Connection" | "elephantry::Async") {
+        if !matches!(
+            method.path.as_str(),
+            "elephantry::Connection" | "elephantry::Async"
+        ) {
             return Ok(());
         }
 
@@ -49,14 +57,17 @@ impl InvalidQuery {
             return Ok(());
         }
 
-        Self::check_sql(elephantry, None, &method.args[0], false)
+        Self::check_expr(elephantry, None, &method.args[0], false)
     }
 
     fn check_query<'a>(
         elephantry: &elephantry::Connection,
         method: &super::Method<'a>,
     ) -> Result<'a> {
-        if !matches!(method.path.as_str(), "elephantry::Connection" | "elephantry::Async") {
+        if !matches!(
+            method.path.as_str(),
+            "elephantry::Connection" | "elephantry::Async"
+        ) {
             return Ok(());
         }
 
@@ -64,7 +75,7 @@ impl InvalidQuery {
             return Ok(());
         }
 
-        Self::check_sql(elephantry, None, &method.args[0], true)
+        Self::check_expr(elephantry, None, &method.args[0], true)
     }
 
     fn check_clause<'a>(
@@ -79,7 +90,7 @@ impl InvalidQuery {
             return Ok(());
         }
 
-        Self::check_sql(elephantry, Some("select 1 where"), &method.args[0], true)
+        Self::check_expr(elephantry, Some("select 1 where"), &method.args[0], true)
     }
 
     fn check_suffix<'a>(
@@ -101,41 +112,81 @@ impl InvalidQuery {
             return Ok(());
         };
 
-        Self::check_sql(elephantry, Some("select 1"), suffix, false)
+        Self::check_expr(elephantry, Some("select 1"), suffix, false)
     }
 
-    fn check_sql<'a>(
+    fn check_upsert_target<'a>(
+        elephantry: &elephantry::Connection,
+        method: &super::Method<'a>,
+    ) -> Result<'a> {
+        if method.path != "elephantry::Connection" {
+            return Ok(());
+        }
+
+        if method.name != "upsert_one" {
+            return Ok(());
+        }
+
+        let Some(arg) = super::expr_to_string(&method.args[1]) else {
+            return Ok(());
+        };
+
+        let query = format!("insert into test values(1) on conflict {arg} do nothing");
+        Self::check_sql(elephantry, &query, false).map_err(|e| (e, &method.args[1]))
+    }
+
+    fn check_upsert_action<'a>(
+        elephantry: &elephantry::Connection,
+        method: &super::Method<'a>,
+    ) -> Result<'a> {
+        if method.path != "elephantry::Connection" {
+            return Ok(());
+        }
+
+        if method.name != "upsert_one" {
+            return Ok(());
+        }
+
+        let Some(arg) = super::expr_to_string(&method.args[2]) else {
+            return Ok(());
+        };
+
+        let query = format!("insert into test values(1) on conflict (test) do {arg}");
+        Self::check_sql(elephantry, &query, false).map_err(|e| (e, &method.args[2]))
+    }
+
+    fn check_expr<'a>(
         elephantry: &elephantry::Connection,
         prefix: Option<&str>,
         arg: &'a rustc_hir::Expr<'a>,
         order: bool,
     ) -> Result<'a> {
-        let rustc_hir::ExprKind::Lit(lit) = &arg.kind else {
+        let Some(s) = super::expr_to_string(arg) else {
             return Ok(());
         };
 
-        let rustc_ast::LitKind::Str(symbol, _) = lit.node else {
-            return Ok(());
-        };
+        let query = format!("{} {s}", prefix.unwrap_or_default());
+        Self::check_sql(elephantry, &query, order).map_err(|e| (e, arg))
+    }
 
-        let query = symbol.to_ident_string();
-
+    fn check_sql<'a>(
+        elephantry: &elephantry::Connection,
+        sql: &str,
+        order: bool,
+    ) -> elephantry::Result {
         let mut query = if order {
-            Self::order_parameters(&query).to_string()
+            Self::order_parameters(&sql).to_string()
         } else {
-            query.to_string()
+            sql.to_string()
         };
 
         if !query.ends_with(';') {
             query.push(';');
         }
 
-        let sql = format!(
-            "DO $TEST$ BEGIN RETURN;{} {query}END; $TEST$;",
-            prefix.unwrap_or_default()
-        );
+        let query = format!("DO $TEST$ BEGIN RETURN;{query}END; $TEST$;");
 
-        elephantry.execute(&sql).map(|_| ()).map_err(|e| (e, arg))
+        elephantry.execute(&query).map(|_| ())
     }
 
     fn order_parameters(query: &str) -> std::borrow::Cow<'_, str> {

@@ -32,7 +32,8 @@ fn method_call<'a>(
     let caller_ty = cx.typeck_results().expr_ty(recv);
 
     let adt = if let rustc_middle::ty::Ref(_, ty, _) = caller_ty.kind()
-        && let rustc_middle::ty::Adt(adt, _) = ty.kind() {
+        && let rustc_middle::ty::Adt(adt, _) = ty.kind()
+    {
         adt
     } else if let rustc_middle::ty::Adt(adt, _) = caller_ty.kind() {
         adt
@@ -63,7 +64,7 @@ struct Function<'a> {
 
 fn function_call<'a>(
     cx: &rustc_lint::LateContext<'_>,
-    expr: &'a rustc_hir::Expr<'_>,
+    expr: &rustc_hir::Expr<'a>,
 ) -> Option<Function<'a>> {
     let rustc_hir::ExprKind::Call(function, args) = expr.kind else {
         return None;
@@ -83,4 +84,16 @@ fn function_call<'a>(
     };
 
     Some(function)
+}
+
+fn expr_to_string(expr: &rustc_hir::Expr<'_>) -> Option<String> {
+    let rustc_hir::ExprKind::Lit(lit) = &expr.kind else {
+        return None;
+    };
+
+    let rustc_ast::LitKind::Str(symbol, _) = lit.node else {
+        return None;
+    };
+
+    Some(symbol.to_ident_string())
 }

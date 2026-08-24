@@ -1,6 +1,6 @@
 #![allow(dead_code)]
 
-#[derive(elephantry::Entity)]
+#[derive(Default, elephantry::Entity)]
 #[elephantry(model = "Model", structure = "Structure")]
 struct Entity {}
 
@@ -56,6 +56,14 @@ fn delete_where(elephantry: &elephantry::Connection) -> elephantry::Result {
 
 async fn r#async(elephantry: &elephantry::Connection) -> elephantry::Result {
     elephantry.r#async().execute("s").await.map(convert::unit)
+}
+
+fn upsert(elephantry: &elephantry::Connection) -> elephantry::Result {
+    let entity = Entity::default();
+
+    elephantry
+        .upsert_one::<Model>(&entity, "invalid_target", "invalid_action")
+        .map(convert::unit)
 }
 
 mod convert {
