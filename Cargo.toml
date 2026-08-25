@@ -27,3 +27,7 @@ path = "ui/invalid_query.rs"
 [[example]]
 name = "pager_start_page"
 path = "ui/pager_start_page.rs"
+
+[[example]]
+name = "param_arg_count"
+path = "ui/param_arg_count.rs"

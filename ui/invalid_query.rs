@@ -28,25 +28,25 @@ fn find_all(elephantry: &elephantry::Connection) -> elephantry::Result {
 
 fn find_where(elephantry: &elephantry::Connection) -> elephantry::Result {
     elephantry
-        .find_where::<Model>("$* =", &[], None)
+        .find_where::<Model>("test =", &[], None)
         .map(convert::unit)
 }
 
 fn paginate_find_where(elephantry: &elephantry::Connection) -> elephantry::Result {
     elephantry
-        .paginate_find_where::<Model>("$* = 0", &[], 20, 0, None)
+        .paginate_find_where::<Model>("test = 0", &[], 20, 0, None)
         .map(convert::unit)
 }
 
 fn count_where(elephantry: &elephantry::Connection) -> elephantry::Result {
     elephantry
-        .count_where::<Model>("valid = $", &[&true])
+        .count_where::<Model>("valid = $", &[])
         .map(convert::unit)
 }
 
 fn exist_where(elephantry: &elephantry::Connection) -> elephantry::Result {
     elephantry
-        .exist_where::<Model>("valid = $", &[&true])
+        .exist_where::<Model>("valid = $", &[])
         .map(convert::unit)
 }
 

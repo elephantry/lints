@@ -24,26 +24,26 @@ LL |         .find_all::<Model>(Some("order y 1"))
 error: invalid SQL query
   --> $DIR/invalid_query.rs:31:30
    |
-LL |         .find_where::<Model>("$* =", &[], None)
-   |                              ^^^^^^
+LL |         .find_where::<Model>("test =", &[], None)
+   |                              ^^^^^^^^
    |
-   = help: ERROR:  syntax error at end of input at character 19:
+   = help: ERROR:  syntax error at end of input at character 21:
            
-           select 1 where $* =
-           ___________________^
+           select 1 where test =
+           _____________________^
 
 warning: pager page starts at 1
-  --> $DIR/invalid_query.rs:37:58
+  --> $DIR/invalid_query.rs:37:60
    |
-LL |         .paginate_find_where::<Model>("$* = 0", &[], 20, 0, None)
-   |                                                          ^
+LL |         .paginate_find_where::<Model>("test = 0", &[], 20, 0, None)
+   |                                                            ^
    |
    = note: `#[warn(pager_start_page)]` on by default
 
 error: invalid SQL query
   --> $DIR/invalid_query.rs:43:31
    |
-LL |         .count_where::<Model>("valid = $", &[&true])
+LL |         .count_where::<Model>("valid = $", &[])
    |                               ^^^^^^^^^^^
    |
    = help: ERROR:  syntax error at or near "$" at character 23:
@@ -54,7 +54,7 @@ LL |         .count_where::<Model>("valid = $", &[&true])
 error: invalid SQL query
   --> $DIR/invalid_query.rs:49:31
    |
-LL |         .exist_where::<Model>("valid = $", &[&true])
+LL |         .exist_where::<Model>("valid = $", &[])
    |                               ^^^^^^^^^^^
    |
    = help: ERROR:  syntax error at or near "$" at character 23:

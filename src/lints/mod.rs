@@ -1,5 +1,6 @@
 mod invalid_query;
 mod pager_start_page;
+mod param_arg_count;
 
 #[unsafe(no_mangle)]
 pub fn register_lints(sess: &rustc_session::Session, lint_store: &mut rustc_lint::LintStore) {
@@ -7,9 +8,11 @@ pub fn register_lints(sess: &rustc_session::Session, lint_store: &mut rustc_lint
     lint_store.register_lints(&[
         invalid_query::INVALID_QUERY,
         pager_start_page::PAGER_START_PAGE,
+        param_arg_count::PARAM_ARG_COUNT,
     ]);
     lint_store.register_late_pass(|_| Box::new(invalid_query::InvalidQuery));
     lint_store.register_late_pass(|_| Box::new(pager_start_page::PagerStartPage));
+    lint_store.register_late_pass(|_| Box::new(param_arg_count::ParamArgCount));
 }
 
 #[derive(Debug)]

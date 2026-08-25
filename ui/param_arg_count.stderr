@@ -1,0 +1,25 @@
+error: 1 positional argument(s) in query, but there is 0 argument(s)
+  --> $DIR/param_arg_count.rs:10:32
+   |
+LL |     elephantry.query_one::<()>("select $*", &[])?;
+   |                                ^^^^^^^^^^^  ^^^
+   |
+   = note: `#[deny(param_arg_count)]` on by default
+
+error: 1 positional argument(s) in query, but there is 3 argument(s)
+  --> $DIR/param_arg_count.rs:11:32
+   |
+LL |     elephantry.query_one::<()>("select $1, $2", &[&1, &2, &3])?;
+   |                                ^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^
+
+error: arguments never used
+  --> $DIR/param_arg_count.rs:12:32
+   |
+LL |     elephantry.query_one::<()>("select 1", &[&1, &2])
+   |                                ^^^^^^^^^^    --  -- argument never used
+   |                                |             |
+   |                                |             argument never used
+   |                                parameter missing
+
+error: aborting due to 3 previous errors
+
