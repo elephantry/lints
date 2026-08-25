@@ -26,26 +26,24 @@ impl<'tcx> rustc_lint::LateLintPass<'tcx> for InvalidQuery {
         results
             .into_iter()
             .filter_map(std::result::Result::err)
-            .for_each(|(err, expr)| {
+            .for_each(|e| {
                 clippy_utils::diagnostics::span_lint_and_help(
                     cx,
                     INVALID_QUERY,
-                    expr.span,
+                    e.span(),
                     "invalid SQL query",
                     None,
-                    err.to_string(),
+                    e.to_string(),
                 );
             });
     }
 }
 
-type Result<'a, T = ()> = std::result::Result<T, (elephantry::Error, &'a rustc_hir::Expr<'a>)>;
-
 impl InvalidQuery {
     fn check_execute<'a>(
         elephantry: &elephantry::Connection,
         method: &super::Method<'a>,
-    ) -> Result<'a> {
+    ) -> crate::Result<'a> {
         if !matches!(
             method.path.as_str(),
             "elephantry::Connection" | "elephantry::Async"
@@ -63,7 +61,7 @@ impl InvalidQuery {
     fn check_query<'a>(
         elephantry: &elephantry::Connection,
         method: &super::Method<'a>,
-    ) -> Result<'a> {
+    ) -> crate::Result<'a> {
         if !matches!(
             method.path.as_str(),
             "elephantry::Connection" | "elephantry::Async"
@@ -81,7 +79,7 @@ impl InvalidQuery {
     fn check_clause<'a>(
         elephantry: &elephantry::Connection,
         method: &super::Method<'a>,
-    ) -> Result<'a> {
+    ) -> crate::Result<'a> {
         if method.path != "elephantry::Connection" {
             return Ok(());
         }
@@ -97,7 +95,7 @@ impl InvalidQuery {
         cx: &rustc_lint::LateContext<'_>,
         elephantry: &elephantry::Connection,
         method: &super::Method<'a>,
-    ) -> Result<'a> {
+    ) -> crate::Result<'a> {
         if method.path != "elephantry::Connection" {
             return Ok(());
         }
@@ -118,7 +116,7 @@ impl InvalidQuery {
     fn check_upsert_target<'a>(
         elephantry: &elephantry::Connection,
         method: &super::Method<'a>,
-    ) -> Result<'a> {
+    ) -> crate::Result<'a> {
         if method.path != "elephantry::Connection" {
             return Ok(());
         }
@@ -132,13 +130,13 @@ impl InvalidQuery {
         };
 
         let query = format!("insert into test values(1) on conflict {arg} do nothing");
-        Self::check_sql(elephantry, &query, false).map_err(|e| (e, &method.args[1]))
+        Self::check_sql(elephantry, &query, false).map_err(|e| (e, &method.args[1], query).into())
     }
 
     fn check_upsert_action<'a>(
         elephantry: &elephantry::Connection,
         method: &super::Method<'a>,
-    ) -> Result<'a> {
+    ) -> crate::Result<'a> {
         if method.path != "elephantry::Connection" {
             return Ok(());
         }
@@ -152,7 +150,7 @@ impl InvalidQuery {
         };
 
         let query = format!("insert into test values(1) on conflict (test) do {arg}");
-        Self::check_sql(elephantry, &query, false).map_err(|e| (e, &method.args[2]))
+        Self::check_sql(elephantry, &query, false).map_err(|e| (e, &method.args[2], query).into())
     }
 
     fn check_expr<'a>(
@@ -160,13 +158,13 @@ impl InvalidQuery {
         prefix: Option<&str>,
         arg: &'a rustc_hir::Expr<'a>,
         order: bool,
-    ) -> Result<'a> {
+    ) -> crate::Result<'a> {
         let Some(s) = super::expr_to_string(arg) else {
             return Ok(());
         };
 
         let query = format!("{} {s}", prefix.unwrap_or_default());
-        Self::check_sql(elephantry, &query, order).map_err(|e| (e, arg))
+        Self::check_sql(elephantry, &query, order).map_err(|e| (e, arg, query).into())
     }
 
     fn check_sql(

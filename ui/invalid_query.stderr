@@ -4,8 +4,10 @@ error: invalid SQL query
 LL |     elephantry.execute("selec 1").map(convert::unit)
    |                        ^^^^^^^^^
    |
-   = help: ERROR:  syntax error at or near "selec" at character 25
+   = help: ERROR:  syntax error at or near "selec" at character 1:
            
+            selec 1
+           _^
    = note: `#[deny(invalid_query)]` on by default
 
 error: invalid SQL query
@@ -14,8 +16,10 @@ error: invalid SQL query
 LL |         .find_all::<Model>(Some("order y 1"))
    |                                 ^^^^^^^^^^^
    |
-   = help: ERROR:  syntax error at or near "y" at character 39
+   = help: ERROR:  syntax error at or near "y" at character 15:
            
+           select 1 order y 1
+           _______________^
 
 error: invalid SQL query
   --> $DIR/invalid_query.rs:31:30
@@ -23,8 +27,10 @@ error: invalid SQL query
 LL |         .find_where::<Model>("$* =", &[], None)
    |                              ^^^^^^
    |
-   = help: ERROR:  syntax error at end of input at character 43
+   = help: ERROR:  syntax error at end of input at character 19:
            
+           select 1 where $* =
+           ___________________^
 
 warning: pager page starts at 1
   --> $DIR/invalid_query.rs:37:58
@@ -40,8 +46,10 @@ error: invalid SQL query
 LL |         .count_where::<Model>("valid = $", &[&true])
    |                               ^^^^^^^^^^^
    |
-   = help: ERROR:  syntax error at or near "$" at character 47
+   = help: ERROR:  syntax error at or near "$" at character 23:
            
+           select 1 where valid = $
+           _______________________^
 
 error: invalid SQL query
   --> $DIR/invalid_query.rs:49:31
@@ -49,8 +57,10 @@ error: invalid SQL query
 LL |         .exist_where::<Model>("valid = $", &[&true])
    |                               ^^^^^^^^^^^
    |
-   = help: ERROR:  syntax error at or near "$" at character 47
+   = help: ERROR:  syntax error at or near "$" at character 23:
            
+           select 1 where valid = $
+           _______________________^
 
 error: invalid SQL query
   --> $DIR/invalid_query.rs:54:38
@@ -58,8 +68,10 @@ error: invalid SQL query
 LL |     elephantry.delete_where::<Model>("", &[]).map(convert::unit)
    |                                      ^^
    |
-   = help: ERROR:  syntax error at end of input at character 38
+   = help: ERROR:  syntax error at end of input at character 14:
            
+           select 1 where 
+           ______________^
 
 error: invalid SQL query
   --> $DIR/invalid_query.rs:58:34
@@ -67,8 +79,10 @@ error: invalid SQL query
 LL |     elephantry.r#async().execute("s").await.map(convert::unit)
    |                                  ^^^
    |
-   = help: ERROR:  syntax error at or near "s" at character 25
+   = help: ERROR:  syntax error at or near "s" at character 1:
            
+            s
+           _^
 
 error: invalid SQL query
   --> $DIR/invalid_query.rs:65:39
@@ -76,8 +90,10 @@ error: invalid SQL query
 LL |         .upsert_one::<Model>(&entity, "invalid_target", "invalid_action")
    |                                       ^^^^^^^^^^^^^^^^
    |
-   = help: ERROR:  syntax error at or near "invalid_target" at character 63
+   = help: ERROR:  syntax error at or near "invalid_target" at character 39:
            
+           insert into test values(1) on conflict invalid_target do nothing
+           _______________________________________^
 
 error: invalid SQL query
   --> $DIR/invalid_query.rs:65:57
@@ -85,8 +101,10 @@ error: invalid SQL query
 LL |         .upsert_one::<Model>(&entity, "invalid_target", "invalid_action")
    |                                                         ^^^^^^^^^^^^^^^^
    |
-   = help: ERROR:  syntax error at or near "invalid_action" at character 73
+   = help: ERROR:  syntax error at or near "invalid_action" at character 49:
            
+           insert into test values(1) on conflict (test) do invalid_action
+           _________________________________________________^
 
 error: aborting due to 9 previous errors; 1 warning emitted
 
