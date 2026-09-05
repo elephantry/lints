@@ -1,6 +1,14 @@
 rustc_session::declare_lint!(pub PAGER_START_PAGE, Warn, "check pager start page");
 rustc_session::declare_lint_pass!(PagerStartPage => [PAGER_START_PAGE]);
 
+pub fn register_lint(lint_store: &mut rustc_lint::LintStore) {
+    lint_store.register_lints(&[PAGER_START_PAGE]);
+}
+
+pub fn register_pass(lint_store: &mut rustc_lint::LintStore) {
+    lint_store.register_late_pass(|_| Box::new(PagerStartPage));
+}
+
 impl<'tcx> rustc_lint::LateLintPass<'tcx> for PagerStartPage {
     fn check_expr(
         &mut self,

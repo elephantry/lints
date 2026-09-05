@@ -1,6 +1,14 @@
 rustc_session::declare_lint!(pub PARAM_ARG_COUNT, Deny, "check if params arg count");
 rustc_session::declare_lint_pass!(ParamArgCount => [PARAM_ARG_COUNT]);
 
+pub fn register_lint(lint_store: &mut rustc_lint::LintStore) {
+    lint_store.register_lints(&[PARAM_ARG_COUNT]);
+}
+
+pub fn register_pass(lint_store: &mut rustc_lint::LintStore) {
+    lint_store.register_late_pass(|_| Box::new(ParamArgCount));
+}
+
 enum Error<'m> {
     NeverUse(&'m rustc_hir::Expr<'m>, &'m [rustc_hir::Expr<'m>]),
     Missing(&'m super::Method<'m>, usize, usize),

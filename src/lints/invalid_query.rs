@@ -1,6 +1,14 @@
 rustc_session::declare_lint!(pub INVALID_QUERY, Deny, "check SQL query");
 rustc_session::declare_lint_pass!(InvalidQuery => [INVALID_QUERY]);
 
+pub fn register_lint(lint_store: &mut rustc_lint::LintStore) {
+    lint_store.register_lints(&[INVALID_QUERY]);
+}
+
+pub fn register_pass(lint_store: &mut rustc_lint::LintStore) {
+    lint_store.register_late_pass(|_| Box::new(InvalidQuery));
+}
+
 impl<'tcx> rustc_lint::LateLintPass<'tcx> for InvalidQuery {
     fn check_expr(
         &mut self,
