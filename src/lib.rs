@@ -21,7 +21,7 @@ pub fn register_lints(sess: &rustc_session::Session, lint_store: &mut rustc_lint
         ($name:ident) => {
             lints::$name::register_lint(lint_store);
             lints::$name::register_pass(lint_store);
-        }
+        };
     }
 
     dylint_linting::init_config(sess);
