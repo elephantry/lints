@@ -104,7 +104,7 @@ impl ParamArgCount {
         static REGEX: std::sync::LazyLock<regex::Regex> =
             std::sync::LazyLock::new(|| regex::Regex::new(r"\$\*|\$\d+").unwrap());
 
-        REGEX.captures(query).map(|x| x.len()).unwrap_or_default()
+        REGEX.find_iter(query).count()
     }
 }
 

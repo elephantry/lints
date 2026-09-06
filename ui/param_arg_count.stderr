@@ -6,7 +6,7 @@ LL |     elephantry.query_one::<()>("select $*", &[])?;
    |
    = note: `#[deny(param_arg_count)]` on by default
 
-error: 1 positional argument(s) in query, but there is 3 argument(s)
+error: 2 positional argument(s) in query, but there is 3 argument(s)
   --> $DIR/param_arg_count.rs:11:32
    |
 LL |     elephantry.query_one::<()>("select $1, $2", &[&1, &2, &3])?;
