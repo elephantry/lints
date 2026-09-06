@@ -101,10 +101,28 @@ impl ParamArgCount {
     }
 
     fn count_param(query: &str) -> usize {
-        static REGEX: std::sync::LazyLock<regex::Regex> =
-            std::sync::LazyLock::new(|| regex::Regex::new(r"\$\*|\$\d+").unwrap());
+        let query = if query.contains("$*") {
+            static REGEX: std::sync::LazyLock<regex::Regex> =
+                std::sync::LazyLock::new(|| regex::Regex::new(r"\$\*").unwrap());
 
-        REGEX.find_iter(query).count()
+            let mut count = 0;
+
+            REGEX.replace_all(query, |captures: &regex::Captures<'_>| {
+                count += 1;
+
+                captures[0].replace("$*", &format!("${count}"))
+            }).to_string()
+        } else {
+            query.to_string()
+        };
+
+        static REGEX: std::sync::LazyLock<regex::Regex> =
+            std::sync::LazyLock::new(|| regex::Regex::new(r"\$(\d+)").unwrap());
+
+        REGEX.captures_iter(&query)
+            .map(|x| x[1].parse().unwrap())
+            .max()
+            .unwrap_or_default()
     }
 }
 
