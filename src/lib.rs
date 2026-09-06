@@ -27,6 +27,7 @@ pub fn register_lints(sess: &rustc_session::Session, lint_store: &mut rustc_lint
     dylint_linting::init_config(sess);
 
     register!(invalid_query);
+    register!(mix_param_type);
     register!(pager_start_page);
     register!(param_arg_count);
 }

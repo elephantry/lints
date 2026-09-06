@@ -1,4 +1,5 @@
 pub mod invalid_query;
+pub mod mix_param_type;
 pub mod pager_start_page;
 pub mod param_arg_count;
 

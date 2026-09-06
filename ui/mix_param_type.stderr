@@ -1,0 +1,10 @@
+warning: this query contains both ordered and unordered param
+  --> $DIR/mix_param_type.rs:6:32
+   |
+LL |     elephantry.query_one::<()>("select $1, $*", &[&1])
+   |                                ^^^^^^^^^^^^^^^
+   |
+   = note: `#[warn(mix_param_type)]` on by default
+
+warning: 1 warning emitted
+

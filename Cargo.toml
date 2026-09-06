@@ -25,6 +25,10 @@ name = "invalid_query"
 path = "ui/invalid_query.rs"
 
 [[example]]
+name = "mix_param_type"
+path = "ui/mix_param_type.rs"
+
+[[example]]
 name = "pager_start_page"
 path = "ui/pager_start_page.rs"
 
