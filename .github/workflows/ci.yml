@@ -12,7 +12,7 @@ jobs:
 
     steps:
       - uses: actions/checkout@v7
-      - uses: dtolnay/rust-toolchain@stable
+      - uses: dtolnay/rust-toolchain@nightly
         with:
           components: rustfmt
       - name: Check formating
@@ -24,10 +24,9 @@ jobs:
 
     steps:
       - uses: actions/checkout@v7
-      - uses: dtolnay/rust-toolchain@stable
+      - uses: dtolnay/rust-toolchain@nightly
         with:
           components: clippy
-
       - name: Run clippy
         run: cargo clippy --all-features --all-targets -- --deny warnings
 
@@ -37,7 +36,7 @@ jobs:
 
     steps:
       - uses: actions/checkout@v7
-      - uses: dtolnay/rust-toolchain@stable
+      - uses: dtolnay/rust-toolchain@nightly
       - name: Install cargo-shear
         run: cargo install cargo-shear
       - name: Run cargo-shear
@@ -52,14 +51,10 @@ jobs:
 
     steps:
       - uses: actions/checkout@v7
-      - uses: dtolnay/rust-toolchain@stable
-        with:
-          toolchain: stable
-
+      - uses: dtolnay/rust-toolchain@nightly
       - name: Run tests (debug)
         if: matrix.mode == 'debug'
         run: cargo test --all-features
-
       - name: Run tests (release)
         if: matrix.mode == 'release'
         run: cargo test --all-features --release
